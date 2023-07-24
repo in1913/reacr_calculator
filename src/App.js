@@ -24,6 +24,7 @@ const App = () => {
 
   let [calc, setCalc] = useState({
     sign : "",
+    isEqual : 0,
     num : 0,
     res : 0
   });
@@ -31,13 +32,25 @@ const App = () => {
   const numClick = (e) => {
     e.preventDefault();
     const value = e.target.innerHTML;
-    if(removeSpaces(calc.num).length < 16){
-      setCalc({
-        ...calc,
-        num : removeSpaces(calc.num) % 1 === 0 && !calc.num.toString().includes(".") ? toLocaleString(Number(removeSpaces(calc.num + value))) : toLocaleString(calc.num + value),
-        res : !calc.sign ? 0 : calc.res
-
-      })
+    if(calc.isEqual === 0){
+      if(removeSpaces(calc.num).length < 16){
+        setCalc({
+          ...calc,
+          num : removeSpaces(calc.num) % 1 === 0 && !calc.num.toString().includes(".") ? toLocaleString(Number(removeSpaces(calc.num + value))) : toLocaleString(calc.num + value),
+          res : !calc.sign ? 0 : calc.res
+  
+        });
+      }
+    }else{
+      if(removeSpaces(calc.num).length < 16){
+        setCalc({
+          ...calc,
+          isEqual : 0,
+          num : removeSpaces(calc.num) % 1 === 0 && !calc.num.toString().includes(".") ? toLocaleString(Number(removeSpaces(calc.num + value))) : toLocaleString(calc.num + value),
+          res : 0
+  
+        });
+      }
     }
   }
 
@@ -45,19 +58,37 @@ const App = () => {
     setCalc({
       ...calc,
       sign : "",
+      isEqual : 0,
       num : 0,
       res : 0
     })
   }
 
-  const invertClick = () => {}
-
-  const percentClick = () => {}
-
-  const signClick = (e) => {
+  const invertClick = () => {
     setCalc({
       ...calc,
-      sign : e.target.innerHTML,
+        num : Number(calc.num) < 0 ? Number(calc.num) * (-1) : Number(calc.num) * (-1)
+    })
+  }
+
+  const percentClick = () => {
+    setCalc({
+      ...calc,
+        num : Number(calc.num) * 0.01
+    })
+  }
+
+  const commaClick = () => {
+    setCalc({
+      ...calc,
+        num : calc.num + "."
+    })
+  }
+
+  const equalsClick = () => {
+    setCalc({
+      ...calc,
+      isEqual : 1,
       num : 0,
       res : !calc.num ? calc.res 
             : !calc.res ? calc.num 
@@ -69,11 +100,34 @@ const App = () => {
                 )
               )
     })
+    console.log(calc);
+  }
+
+  const signClick = (e) => {
+    if(calc.num === 0){
+      invertClick();
+    }else{
+      setCalc({
+        ...calc,
+        sign : e.target.innerHTML,
+        isEqual : 0,
+        num : 0,
+        res : !calc.num ? calc.res 
+              : !calc.res ? calc.num 
+              : toLocaleString(
+                  math(
+                    Number(removeSpaces(calc.res)),
+                    Number(removeSpaces(calc.num)),
+                    calc.sign
+                  )
+                )
+      })
+    }
+    
+    console.log(calc);
   }
   
-  const equalsClick = () => {}
-
-  const commaClick = () => {}
+  
 
   const buttonClick = (e, btn) => {
     btn === "C" ? resetClick() 
